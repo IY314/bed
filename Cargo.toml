@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+ansi_term = "0.12.1"
 dirs = "4.0.0"
+logos = "0.12.1"
 rustyline = "10.0.0"
 text_io = "0.1.12"
