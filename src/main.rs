@@ -2,12 +2,7 @@ extern crate alloc;
 
 use alloc::borrow::Cow;
 
-use std::{
-    collections::BTreeMap,
-    fmt::{Debug, Display},
-    io::Write,
-    str::FromStr,
-};
+use std::{collections::BTreeMap, fmt::Debug, io::Write};
 
 use rustyline::{
     completion::Completer,
@@ -28,7 +23,17 @@ use text_io::try_read;
 
 fn get_ln(s: &String) -> Option<usize> {
     match {
-        let res: Result<usize, _> = try_read!(s.bytes());
+        let res: Result<usize, _> = try_read!("{}", s.bytes());
+        res
+    } {
+        Ok(ret) => Some(ret),
+        Err(..) => None,
+    }
+}
+
+fn get_w(s: &String) -> Option<String> {
+    match {
+        let res: Result<String, _> = try_read!("w {}", s.bytes());
         res
     } {
         Ok(ret) => Some(ret),
@@ -178,7 +183,7 @@ fn highlight(buf: &str) -> String {
 }
 
 fn process_input(state: &mut State, input: String) {
-    if let Some(ln) = get_ln::<usize>(&input, "{}") {
+    if let Some(ln) = get_ln(&input) {
         state.buffer.insert(ln, input);
     } else {
         if input == "r" {
@@ -198,7 +203,7 @@ fn process_input(state: &mut State, input: String) {
 
             state.buffer.clear();
             state.buffer.append(&mut new_buf);
-        } else if let Some(w) = get_ln::<String>(&input, "w {}") {
+        } else if let Some(w) = get_w(&input) {
             let mut file = std::fs::File::create(w).expect("Could not create file");
             file.write_all(
                 state
@@ -212,7 +217,7 @@ fn process_input(state: &mut State, input: String) {
             .expect("Could not write to file");
         } else if input == "p" {
             println!(
-                "d{}",
+                "{}",
                 highlight(
                     state
                         .buffer
